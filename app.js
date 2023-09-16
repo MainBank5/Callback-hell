@@ -1,4 +1,6 @@
-/*xhr.open('GET' , '/movies.json');
+const xhr = new XMLHttpRequest();
+
+xhr.open('GET' , '/movies.json');
 
 xhr.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
@@ -6,34 +8,62 @@ xhr.onreadystatechange = function () {
     }
 }
 
-xhr.send()*/
+xhr.send()
 
 console.log('Hello from global')
 
 
 
 
-function getData (endPoints, cb){
+function getData (endPoints){
 
-    const xhr = new XMLHttpRequest();
-    
-    xhr.open('GET', endPoints);
-    
-    xhr.onreadystatechange = function () {
-    if (this.readyState == 4 &&this.status == 200){
-        //console.log(JSON.parse(this.responseText))
-        cb(JSON.parse(this.responseText))
-    }
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        
+        xhr.open('GET', endPoints);
+        
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                //reject if status isnt 200
+                if(this.status == 200) {
+                    resolve(JSON.parse(this.responseText))
+                }  else {
+                    reject('Something went wrong')
+                }
+            }
+        }
+        setTimeout( ()=> {
+            xhr.send() 
+        }, Math.floor(Math.random()* 3000) + 1000)  
+    }) 
 }
 
-setTimeout( ()=> {
-   xhr.send() 
-}, Math.floor(Math.random()* 3000) + 1000)
 
 
-}
+/*getData('/movies.json').then((movies) => {
+    console.log(movies);
+    return getData('/actors.json')
+}).then((actors) => {
+  console.log(actors);
+  return getData('/directors.json')
+}).then((direct) => console.log(direct)).catch((error) => console.log(error))*/
 
-getData('/movies.json', (data) => {
+const moviesPromise = getData('/movies.json');
+const actorsPromise = getData('/actors.json');
+const directorsPromise = getData('/directors.json');
+
+//advantange of using .all is you can even add an unrelated promise 
+const dummyPromise = new Promise((resolve, reject) => {
+    resolve('It accepts additional promises')
+})
+//they'll be displayed in the specific order they were passed in the .all
+Promise.all([moviesPromise, actorsPromise, directorsPromise, dummyPromise])
+.then((data) => console.log(data))
+
+
+
+//solution 1 - callback hell
+/*getData('/movies.json', (data) => {
     console.log(data);
     getData('/actors.json', (data) => {
         console.log(data);
@@ -41,7 +71,7 @@ getData('/movies.json', (data) => {
             console.log(data)
         })
     })
-});
+});*/
 
 /*getData('/actors.json');
 getData('/directors.json');*/
@@ -86,8 +116,12 @@ const getUser = new Promise((resolve, reject) => {
     }, 2000)
 })
 
+//promise chaining
 getUser.then((user) => {
     console.log(user)
+    return user.name
+}).then((name) => {
+    console.log(name)
 }).catch((fallback) => {
     console.warn(fallback)
 })
@@ -123,16 +157,16 @@ const recordVideoThree = new Promise ((resolve, reject) => {
 });
 
 
-/*promise.all([recordVideoOne, 
+Promise.all([recordVideoOne, 
 recordVideoTwo, 
 recordVideoThree]).then((messages) => {
     console.log(messages)
 })
 
 //as soon as the first one gets executed the message is returned 
-promise.race([recordVideoOne, 
+Promise.race([recordVideoOne, 
 recordVideoTwo, 
 recordVideoThree]).then((message) => {
     console.log(message)
-})*/
+})
 
