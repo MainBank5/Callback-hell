@@ -170,3 +170,26 @@ recordVideoThree]).then((message) => {
     console.log(message)
 })
 
+const typicode = async () => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users?_limit=6');
+
+    const data = await response.json();
+
+    return data
+}
+
+typicode().then((data) => console.log(data));
+
+const getTodo = async () => {
+    const response = await fetch('./todo.json');
+
+    if (response.status !== 200) {
+        throw new Error('Cannot fetch the data')
+    }
+    //console.log(response); - gives you the status
+    const data = await response.json();
+    //console.log(data) gets you the actual data in the api 
+    console.log(data);
+}
+
+getTodo()
