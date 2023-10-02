@@ -60,6 +60,26 @@ const dummyPromise = new Promise((resolve, reject) => {
 Promise.all([moviesPromise, actorsPromise, directorsPromise, dummyPromise])
 .then((data) => console.log(data))
 
+//alternatively 
+
+const getAllData = async () => {
+    //deconstruct 
+
+    const[moviesRes, directorRes, actorRes] = await Promise.all([
+        fetch('/movies.json'),
+        fetch('/directors.json'),
+        fetch('/actors.json')
+    ]);
+
+    const movies = await moviesRes.json();
+    const director = await directorRes.json();
+    const actors = await actorRes.json();
+
+    console.log(movies, director, actors);
+}
+
+getAllData()
+
 
 
 //solution 1 - callback hell
